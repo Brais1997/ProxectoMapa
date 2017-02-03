@@ -28,10 +28,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_REQUEST_CODE = 1;
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap mMap;
-    LatLng centro = new LatLng(42.237023, -8.717944);
-    LatLng cmarca = new LatLng(42.237558, -8.717285);
-    Location miubicacion;
+    private LatLng centro = new LatLng(42.237023, -8.717944);
+    private final LatLng cmarca = new LatLng(42.237558, -8.717285);
+    private Location miubicacion;
     Location marcaUbicacion =new Location("mi marca");
+
     int radio = 100;
 
     @Override
@@ -68,15 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
-        CircleOptions marca = new CircleOptions()
-                .center(cmarca)
-                .radius(20)
-                .strokeColor(Color.parseColor("#FF4000"))
-                .strokeWidth(4)
-                .fillColor(Color.argb(32, 33, 150, 243));
-        LatLng premio = new LatLng(42.237558, -8.717285);
-        mMap.addMarker(new MarkerOptions().position(premio).title("Premio"));
-        mMap.addCircle(marca).setVisible(true);
+
+
         CircleOptions circuloCaracteristicas = new CircleOptions()
                 .center(centro)
                 .radius(radio)
@@ -85,7 +79,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .fillColor(Color.argb(32, 33, 150, 243));
 
         mMap.addCircle(circuloCaracteristicas).setVisible(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(premio, 17));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centro, 17));
 
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -136,30 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapClick(LatLng miclick) {
-
-        float distanciaPremio =marcaUbicacion.distanceTo(miubicacion);
-        Toast.makeText(this,"Distancia ao premio :" + distanciaPremio+"  metros", Toast.LENGTH_LONG).show();
-        if(distanciaPremio <=20){
-            CircleOptions circuloCaracteristicas = new CircleOptions()
-                    .center(centro)
-                    .radius(radio)
-                    .strokeColor(Color.parseColor("#0D47A1"))
-                    .strokeWidth(4)
-                    .fillColor(Color.argb(32, 33, 150, 243));
-
-            mMap.addCircle(circuloCaracteristicas).setVisible(true);
-        }
-
-
-
-    }
-
-
-
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -170,9 +141,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         miubicacion = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (miubicacion != null) {
-            System.out.println("Latitud: " + miubicacion.getLatitude() + "\nLongitud: " + miubicacion.getLongitude());
-        }
+        float distanciaPremio = marcaUbicacion.distanceTo(miubicacion);
+
+        if (distanciaPremio <= 20) {
+            Toast.makeText(this, "Distancia ao premio :" + ((int) distanciaPremio) + "  metros", Toast.LENGTH_LONG).show();
+            CircleOptions marca = new CircleOptions()
+                    .center(cmarca)
+                    .radius(20)
+                    .strokeColor(Color.parseColor("#FF4000"))
+                    .strokeWidth(4)
+                    .fillColor(Color.argb(32, 33, 150, 243));
+            mMap.addCircle(marca).setVisible(true);
+            Toast.makeText(this, "Distancia ao premio :" +((int) distanciaPremio) + "  metros", Toast.LENGTH_LONG).show();
+
+        }else if(distanciaPremio <10){
+            CircleOptions marca = new CircleOptions()
+                    .center(cmarca)
+                    .radius(20)
+                    .strokeColor(Color.parseColor("#FF4000"))
+                    .strokeWidth(4)
+                    .fillColor(Color.argb(32, 33, 150, 243));
+            mMap.addCircle(marca).setVisible(true);
+            Toast.makeText(this, "Estas a menos de 10 metros", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this, "Distancia ao premio :" + ((int) distanciaPremio) + "  metros", Toast.LENGTH_LONG).show();
+
+
+    }}
+
+
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
 
     }
 
