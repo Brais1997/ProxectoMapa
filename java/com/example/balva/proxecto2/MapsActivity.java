@@ -1,5 +1,6 @@
 package com.example.balva.proxecto2;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -9,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,7 +27,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,GoogleMap.OnMapClickListener {
+    private static final int TESOURO_REQUEST_CODE = 1;
     private static final int LOCATION_REQUEST_CODE = 1;
+
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap mMap;
     private LatLng centro = new LatLng(42.237023, -8.717944);
@@ -35,12 +39,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     int radio = 100;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        marcaUbicacion.setLatitude(cmarca.latitude);
-        marcaUbicacion.setLongitude(cmarca.longitude);
+        //marcaUbicacion.setLatitude(cmarca.latitude);
+        //marcaUbicacion.setLongitude(cmarca.longitude);
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -51,6 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
     }
 
     @Override
@@ -71,15 +77,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapClickListener(this);
 
 
-        CircleOptions circuloCaracteristicas = new CircleOptions()
+        /*CircleOptions circuloCaracteristicas = new CircleOptions()
                 .center(centro)
                 .radius(radio)
                 .strokeColor(Color.parseColor("#0D47A1"))
                 .strokeWidth(4)
-                .fillColor(Color.argb(32, 33, 150, 243));
+                .fillColor(Color.argb(32, 33, 150, 243));*/
 
-        mMap.addCircle(circuloCaracteristicas).setVisible(true);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centro, 17));
+       // mMap.addCircle(circuloCaracteristicas).setVisible(true);
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(centro, 17));
 
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -143,6 +149,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         miubicacion = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         float distanciaPremio = marcaUbicacion.distanceTo(miubicacion);
 
+
+
         if (distanciaPremio <= 20) {
             Toast.makeText(this, "Distancia ao premio :" + ((int) distanciaPremio) + "  metros", Toast.LENGTH_LONG).show();
             CircleOptions marca = new CircleOptions()
@@ -187,5 +195,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+    void lector(View b){
+        Intent intent = new Intent(getBaseContext(), ScannerActivity.class);
+
+        startActivityForResult(intent, TESOURO_REQUEST_CODE);
+    }
+    @Override
+    protected  void onActivityResult(int requestCode,int resultCode,Intent data){
+        if(requestCode == TESOURO_REQUEST_CODE){
+            if(resultCode==RESULT_OK){
+                String resultado=data.getStringExtra("tesouro");
+                Toast.makeText(getBaseContext(),resultado,Toast.LENGTH_LONG).show();
+
+            }
+        }
+    }
+    void originarMarca
 }
 
